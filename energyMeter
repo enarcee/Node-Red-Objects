@@ -1,0 +1,149 @@
+[
+    {
+        "id": "37f59e39.9047d2",
+        "type": "tab",
+        "label": "energyDemand"
+    },
+    {
+        "id": "b3c988be.c5ed68",
+        "type": "debug",
+        "z": "37f59e39.9047d2",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 877,
+        "y": 413,
+        "wires": []
+    },
+    {
+        "id": "d3491cdc.0a1c",
+        "type": "json",
+        "z": "37f59e39.9047d2",
+        "name": "",
+        "x": 320.00006103515625,
+        "y": 248,
+        "wires": [
+            [
+                "42cc08b0.cdb678"
+            ]
+        ]
+    },
+    {
+        "id": "195eb1fb.2832ae",
+        "type": "inject",
+        "z": "37f59e39.9047d2",
+        "name": "invoke-60s",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "60",
+        "crontab": "",
+        "once": true,
+        "x": 124,
+        "y": 113,
+        "wires": [
+            [
+                "3af69390.b9edac"
+            ]
+        ]
+    },
+    {
+        "id": "3af69390.b9edac",
+        "type": "http request",
+        "z": "37f59e39.9047d2",
+        "name": "getCurrentValuesSummary",
+        "method": "GET",
+        "ret": "txt",
+        "url": "http://www.energyhive.com/mobile_proxy/getCurrentValuesSummary?token=xxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "tls": "",
+        "x": 230,
+        "y": 187,
+        "wires": [
+            [
+                "d3491cdc.0a1c"
+            ]
+        ]
+    },
+    {
+        "id": "42cc08b0.cdb678",
+        "type": "function",
+        "z": "37f59e39.9047d2",
+        "name": "extractReading",
+        "func": "var str = msg.payload[0].data[0];\nmsg.payload = str;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 430,
+        "y": 306,
+        "wires": [
+            [
+                "dc1a5d96.e0f75"
+            ]
+        ]
+    },
+    {
+        "id": "43fa2a86.11db94",
+        "type": "influxdb out",
+        "z": "37f59e39.9047d2",
+        "influxdb": "4ae86f18.a94f4",
+        "name": "",
+        "measurement": "energyMeter",
+        "x": 909,
+        "y": 532,
+        "wires": []
+    },
+    {
+        "id": "fb6bfdd.5a5b9",
+        "type": "function",
+        "z": "37f59e39.9047d2",
+        "name": "subString",
+        "func": "var str = msg.payload;\n// find the index of the closing curly bracket\n// subtract start of substrig to find integer length\nvar idx = str.indexOf(\"}\")-17\n// extract the value for kwm\nvar kwm = str.substr(17, idx);\n// divide by 1000 to represent as kw\nvar kw = kwm/1000; \n// packeage the string as a key value pair\nvar reading = \"{\\\"reading\\\":\"+ kw + \"}\";\n// set it free\nmsg.payload = reading;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 646,
+        "y": 407,
+        "wires": [
+            [
+                "6c7d853e.1b5b1c"
+            ]
+        ]
+    },
+    {
+        "id": "dc1a5d96.e0f75",
+        "type": "json",
+        "z": "37f59e39.9047d2",
+        "name": "",
+        "x": 545,
+        "y": 352,
+        "wires": [
+            [
+                "fb6bfdd.5a5b9"
+            ]
+        ]
+    },
+    {
+        "id": "6c7d853e.1b5b1c",
+        "type": "json",
+        "z": "37f59e39.9047d2",
+        "name": "",
+        "x": 745,
+        "y": 468,
+        "wires": [
+            [
+                "b3c988be.c5ed68",
+                "43fa2a86.11db94"
+            ]
+        ]
+    },
+    {
+        "id": "4ae86f18.a94f4",
+        "type": "influxdb",
+        "z": "",
+        "hostname": "influxdb",
+        "port": "8086",
+        "protocol": "http",
+        "database": "ttndb",
+        "name": "influxdb",
+        "usetls": false
+    }
+]
