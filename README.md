@@ -9,5 +9,6 @@ note: enrgyHive api key required
 Make a call to RFS XML feed (http://www.rfs.nsw.gov.au/feeds/fdrToban.xml) to extract fire ban rating and fire danger rating
 
 <strong>Wunderground</strong></br>
-Make a call to Weather Underground API and extract weather data for a nominated weather station
+Make a call to Weather Underground API and extract weather data for a nominated weather station</br>
+note: weather underground api key and weather station id required
 
