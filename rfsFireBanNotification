@@ -1,0 +1,218 @@
+[
+    {
+        "id": "c30cc3e1.ccc7e",
+        "type": "debug",
+        "z": "6b454a00.7a6318",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 773,
+        "y": 436,
+        "wires": []
+    },
+    {
+        "id": "a91dd3f3.bd434",
+        "type": "http request",
+        "z": "6b454a00.7a6318",
+        "name": "get RFS XML",
+        "method": "GET",
+        "ret": "txt",
+        "url": "http://www.rfs.nsw.gov.au/feeds/fdrToban.xml",
+        "tls": "",
+        "x": 324,
+        "y": 221,
+        "wires": [
+            [
+                "4d738837.05bee8"
+            ]
+        ]
+    },
+    {
+        "id": "d8d45e5b.1c824",
+        "type": "inject",
+        "z": "6b454a00.7a6318",
+        "name": "checkDaily",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "00 14 * * *",
+        "once": false,
+        "x": 252,
+        "y": 141,
+        "wires": [
+            [
+                "a91dd3f3.bd434"
+            ]
+        ]
+    },
+    {
+        "id": "4d738837.05bee8",
+        "type": "xml",
+        "z": "6b454a00.7a6318",
+        "name": "",
+        "attr": "",
+        "chr": "",
+        "x": 399,
+        "y": 291,
+        "wires": [
+            [
+                "46c4201d.8928e"
+            ]
+        ]
+    },
+    {
+        "id": "46c4201d.8928e",
+        "type": "function",
+        "z": "6b454a00.7a6318",
+        "name": "getValues",
+        "func": "var str1 = msg.payload.FireDangerMap.District[3].DangerLevelToday;\nvar str2 = msg.payload.FireDangerMap.District[3].FireBanToday;\n\n// package 'dangerLevelToday' as a key value pair\nvar dlt = \"\\\"dlt\\\": \\\"\" + str1 + \"\\\"\";\n\n// package 'fireBanToday' as a key value pair\nvar fbt = \"\\\"fbt\\\": \\\"\" + str2 + \"\\\"\";\n\n// add JSON curly braces\nvar pkg = \"{\" + dlt + \",\" + fbt + \"}\"; \n\n// set it free\nmsg.payload = pkg\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 464,
+        "y": 365,
+        "wires": [
+            [
+                "bfae0f54.590b1"
+            ]
+        ]
+    },
+    {
+        "id": "bfae0f54.590b1",
+        "type": "json",
+        "z": "6b454a00.7a6318",
+        "name": "",
+        "x": 552,
+        "y": 436,
+        "wires": [
+            [
+                "3b3b899c.577a66"
+            ]
+        ]
+    },
+    {
+        "id": "33435585.bdc89a",
+        "type": "influxdb out",
+        "z": "6b454a00.7a6318",
+        "influxdb": "a267728d.eddda",
+        "name": "influxdb",
+        "measurement": "rfsRss",
+        "x": 791,
+        "y": 587,
+        "wires": []
+    },
+    {
+        "id": "3b3b899c.577a66",
+        "type": "change",
+        "z": "6b454a00.7a6318",
+        "name": "str2num",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload.fbt",
+                "pt": "msg",
+                "from": "Yes",
+                "fromt": "str",
+                "to": "1",
+                "tot": "num"
+            },
+            {
+                "t": "change",
+                "p": "payload.fbt",
+                "pt": "msg",
+                "from": "No",
+                "fromt": "str",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "change",
+                "p": "payload.dlt",
+                "pt": "msg",
+                "from": "None",
+                "fromt": "str",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "change",
+                "p": "payload.dlt",
+                "pt": "msg",
+                "from": "LOW MODERATE",
+                "fromt": "str",
+                "to": "1",
+                "tot": "num"
+            },
+            {
+                "t": "change",
+                "p": "payload.dlt",
+                "pt": "msg",
+                "from": "HIGH",
+                "fromt": "str",
+                "to": "2",
+                "tot": "num"
+            },
+            {
+                "t": "change",
+                "p": "payload.dlt",
+                "pt": "msg",
+                "from": "VERY HIGH",
+                "fromt": "str",
+                "to": "3",
+                "tot": "num"
+            },
+            {
+                "t": "change",
+                "p": "payload.dlt",
+                "pt": "msg",
+                "from": "SEVERE",
+                "fromt": "str",
+                "to": "4",
+                "tot": "num"
+            },
+            {
+                "t": "change",
+                "p": "payload.dlt",
+                "pt": "msg",
+                "from": "EXTREME",
+                "fromt": "str",
+                "to": "5",
+                "tot": "num"
+            },
+            {
+                "t": "change",
+                "p": "payload.dlt",
+                "pt": "msg",
+                "from": "CATASTROPHIC",
+                "fromt": "str",
+                "to": "6",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 635,
+        "y": 512,
+        "wires": [
+            [
+                "c30cc3e1.ccc7e",
+                "33435585.bdc89a"
+            ]
+        ]
+    },
+    {
+        "id": "a267728d.eddda",
+        "type": "influxdb",
+        "z": "",
+        "hostname": "influxdb",
+        "port": "8086",
+        "protocol": "http",
+        "database": "ttndb",
+        "name": "influxdb",
+        "usetls": false
+    }
+]
