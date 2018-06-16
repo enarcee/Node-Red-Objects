@@ -1,0 +1,118 @@
+[
+    {
+        "id": "10edd763.102ee9",
+        "type": "debug",
+        "z": "65d9beb0.75d0a",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 643.01953125,
+        "y": 212.00390625,
+        "wires": []
+    },
+    {
+        "id": "1596911d.e1a02f",
+        "type": "http request",
+        "z": "65d9beb0.75d0a",
+        "name": "Test",
+        "method": "GET",
+        "ret": "obj",
+        "url": "http://api.wunderground.com/api/xxx_my_api_key_xxx/conditions/q/pws:xx_my_station_id_xx.json",
+        "tls": "",
+        "x": 207.01953125,
+        "y": 136.00390625,
+        "wires": [
+            [
+                "e9f4373b.3ebee8"
+            ]
+        ]
+    },
+    {
+        "id": "ddff65c1.f27008",
+        "type": "inject",
+        "z": "65d9beb0.75d0a",
+        "name": "Check 5min",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "300",
+        "crontab": "",
+        "once": false,
+        "x": 144.01953125,
+        "y": 59.00390625,
+        "wires": [
+            [
+                "1596911d.e1a02f"
+            ]
+        ]
+    },
+    {
+        "id": "e9f4373b.3ebee8",
+        "type": "json",
+        "z": "65d9beb0.75d0a",
+        "name": "",
+        "x": 284.11956787109375,
+        "y": 202.40391540527344,
+        "wires": [
+            [
+                "d76d40c.9e54cc"
+            ]
+        ]
+    },
+    {
+        "id": "d76d40c.9e54cc",
+        "type": "json",
+        "z": "65d9beb0.75d0a",
+        "name": "",
+        "x": 422.11956787109375,
+        "y": 204.40391540527344,
+        "wires": [
+            [
+                "d668ef08.8120d"
+            ]
+        ]
+    },
+    {
+        "id": "d668ef08.8120d",
+        "type": "function",
+        "z": "65d9beb0.75d0a",
+        "name": "getValues",
+        "func": "var temp_c = msg.payload.current_observation.temp_c;\nvar relative_humidity = msg.payload.current_observation.relative_humidity;\nvar wind_kph = msg.payload.current_observation.wind_kph;\nvar wind_gust_kph = msg.payload.current_observation.wind_gust_kph;\nvar dewpoint_c = msg.payload.current_observation.dewpoint_c;\nvar solarradiation = parseInt (msg.payload.current_observation.solarradiation);\nvar UV = parseFloat (msg.payload.current_observation.UV);\nvar precip_1hr_metric = parseInt (msg.payload.current_observation.precip_1hr_metric);\nvar precip_today_metric = parseInt (msg.payload.current_observation.precip_today_metric);\nvar pressure_mb = parseInt (msg.payload.current_observation.pressure_mb);\n\nrelative_humidity = parseInt (relative_humidity.replace(/\\%$/, \"\"));\n\nmsg.payload = {};\nmsg.payload.temp_c = temp_c;\nmsg.payload.relative_humidity = relative_humidity;\nmsg.payload.wind_kph = wind_kph;\nmsg.payload.wind_gust_kph = wind_gust_kph;\nmsg.payload.dewpoint_c = dewpoint_c;\nmsg.payload.solarradiation = solarradiation;\nmsg.payload.UV = UV;\nmsg.payload.precip_1hr_metric = precip_1hr_metric;\nmsg.payload.precip_today_metric = precip_today_metric;\nmsg.payload.pressure_mb = pressure_mb;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 512,
+        "y": 276,
+        "wires": [
+            [
+                "10edd763.102ee9",
+                "9068a595.a96738"
+            ]
+        ]
+    },
+    {
+        "id": "9068a595.a96738",
+        "type": "influxdb out",
+        "z": "65d9beb0.75d0a",
+        "influxdb": "a1acccc2.8e65d",
+        "name": "influxdb",
+        "measurement": "homeWeatherStation",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 622,
+        "y": 341,
+        "wires": []
+    },
+    {
+        "id": "a1acccc2.8e65d",
+        "type": "influxdb",
+        "z": "",
+        "hostname": "influxdb",
+        "port": "8086",
+        "protocol": "http",
+        "database": "ttndb",
+        "name": "influxdb",
+        "usetls": false,
+        "tls": ""
+    }
+]
