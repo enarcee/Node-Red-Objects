@@ -16,3 +16,6 @@ note: weather underground api key and weather station id required
 Make a call to oura cloud api to extract 24 hour summary of sleep data
 note: oauth2 access token required
 
+<strong>Ambient Weather Station</strong></br>
+make a call ato ambient wethaer api and store data to influxdb or the home weather station
+
