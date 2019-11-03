@@ -1,0 +1,89 @@
+[
+    {
+        "id": "8c7b1e50.79ab8",
+        "type": "tab",
+        "label": "t2TankDepth",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "86e4ec33.0d68a",
+        "type": "ttn uplink",
+        "z": "8c7b1e50.79ab8",
+        "name": "ts-tank-depth",
+        "app": "89795dcd.5074f",
+        "dev_id": "mdot-sr04t-c728",
+        "field": "",
+        "x": 110,
+        "y": 240,
+        "wires": [
+            [
+                "b71de0bd.bfbe3"
+            ]
+        ]
+    },
+    {
+        "id": "b71de0bd.bfbe3",
+        "type": "function",
+        "z": "8c7b1e50.79ab8",
+        "name": "decode",
+        "func": "// Author: Nick Cross\n// Date: 18 Oct 2019\n//\n// Measure distince from top of water tank to wter level\n//\nvar data = parseInt(msg.payload.toString('utf8'));\nvar rssi = msg.metadata.gateways[0].rssi;\nvar snr = msg.metadata.gateways[0].snr;\n// var app_id = msg.app_id;\n// var dev_id = msg.dev_id;\n//\n// Tank constants for TankMasta TA1402\nvar maxVol = 10000; // as marketed\nvar th = 2.15; // tank height in metres\nvar tr = 1.25; // tank radius in metres\nvar pi = 3.14159; // pi\n//\nvar wh = (th - (data/100)); // calculate water height in m\n// Total available volume Formula\n// pi x (tr x tr) x wh x 1,000 Litres\nvar wv = parseInt((pi*(tr*tr)*wh)*1000); // water volume m3\n\n\n\nmsg.payload = {};\nmsg.payload.data = data;\nmsg.payload.wh = parseFloat(wh.toFixed(2));\nmsg.payload.wv = wv;\nmsg.payload.rssi = rssi;\nmsg.payload.snr = snr;\n// msg.payload.app_id = app_id;\n// msg.payload.dev_id = dev_id;\n//\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 260,
+        "y": 340,
+        "wires": [
+            [
+                "4c482b21.70e504",
+                "2e6c4a0.261a8b6"
+            ]
+        ]
+    },
+    {
+        "id": "4c482b21.70e504",
+        "type": "debug",
+        "z": "8c7b1e50.79ab8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 450,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "2e6c4a0.261a8b6",
+        "type": "influxdb out",
+        "z": "8c7b1e50.79ab8",
+        "influxdb": "921653f8.56283",
+        "name": "t2TankDepth",
+        "measurement": "t2TankDepth",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 430,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "89795dcd.5074f",
+        "type": "ttn app",
+        "z": "",
+        "appId": "water-tank-t2-sr04t",
+        "accessKey": "ttn-account-v2.Mj-6pwhMERwnIn6vVYfcBs_BzgiQM14_hpbTZovKh0o",
+        "discovery": "discovery.thethingsnetwork.org:1900"
+    },
+    {
+        "id": "921653f8.56283",
+        "type": "influxdb",
+        "z": "",
+        "hostname": "influxdb",
+        "port": "8086",
+        "protocol": "http",
+        "database": "ttndb",
+        "name": "influxdb",
+        "usetls": false,
+        "tls": ""
+    }
+]
