@@ -1,0 +1,125 @@
+[
+    {
+        "id": "695fef40.89fa9",
+        "type": "tab",
+        "label": "Ambient Weather",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "b86d24a5.34c678",
+        "type": "debug",
+        "z": "695fef40.89fa9",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 644,
+        "y": 229,
+        "wires": []
+    },
+    {
+        "id": "ac01064.c75c1f8",
+        "type": "http request",
+        "z": "695fef40.89fa9",
+        "name": "Test",
+        "method": "GET",
+        "ret": "obj",
+        "url": "https://api.ambientweather.net/v1/devices?applicationKey=ff5c8005fff74feeb634b250d3108f5b08ceeb73ff0b41e3b9d0202696646d22&apiKey=e1c0c78f29bb4b05929ecbb733f191626f2522ad302b4728bb8f74d09481a307",
+        "tls": "",
+        "x": 208,
+        "y": 153,
+        "wires": [
+            [
+                "97846ec5.bbacb"
+            ]
+        ]
+    },
+    {
+        "id": "ffed9c9a.81f47",
+        "type": "inject",
+        "z": "695fef40.89fa9",
+        "name": "Check 15min",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "900",
+        "crontab": "",
+        "once": false,
+        "x": 155,
+        "y": 76,
+        "wires": [
+            [
+                "ac01064.c75c1f8"
+            ]
+        ]
+    },
+    {
+        "id": "97846ec5.bbacb",
+        "type": "json",
+        "z": "695fef40.89fa9",
+        "name": "",
+        "x": 285.10003662109375,
+        "y": 219.40000915527344,
+        "wires": [
+            [
+                "b71531bf.42dab"
+            ]
+        ]
+    },
+    {
+        "id": "b71531bf.42dab",
+        "type": "json",
+        "z": "695fef40.89fa9",
+        "name": "",
+        "x": 423.10003662109375,
+        "y": 221.40000915527344,
+        "wires": [
+            [
+                "df8d81fe.5a104"
+            ]
+        ]
+    },
+    {
+        "id": "df8d81fe.5a104",
+        "type": "function",
+        "z": "695fef40.89fa9",
+        "name": "getValues",
+        "func": "// Outdoor temperature\nvar temp_f = msg.payload[0].lastData.tempf\nvar temp_c = parseFloat(((temp_f-32)*.5556).toFixed(2))\n// Outdoor Humidity\nvar relative_humidity = msg.payload[0].lastData.humidity\n// Wind Speed\nvar wind_mph = msg.payload[0].lastData.windspeedmph\nvar wind_kph = (wind_mph * 1.60934)\n// Wind Gust\nvar wind_gust_mph = msg.payload[0].lastData.windspeedmph\nvar wind_gust_kph = (wind_gust_mph * 1.60934)\n// Wind Gust\nvar max_daily_gust_mph = msg.payload[0].lastData.maxdailygust\nvar max_daily_gust_kph = (max_daily_gust_mph * 1.60934)\n// Dew Point\nvar dewpoint_f = msg.payload[0].lastData.dewPoint\nvar dewpoint_c = parseFloat(((dewpoint_f-32)*0.5556).toFixed(2))\n// Solar Radiation\nvar solarradiation = msg.payload[0].lastData.solarradiation\n// UV\nvar UV = msg.payload[0].lastData.uv\n// Rain\nprecip_1hr_in = msg.payload[0].lastData.hourlyrainin\nvar precip_1hr_mm = precip_1hr_in * 25.4\nprecip_24hr_in = msg.payload[0].lastData.dailyrainin\nvar precip_24hr_mm = parseFloat((precip_24hr_in * 25.4).toFixed(2))\nprecip_mth_in = msg.payload[0].lastData.monthlyrainin\nvar precip_mth_mm = parseFloat((precip_mth_in * 25.4).toFixed(2))\nprecip_yr_in = msg.payload[0].lastData.yearlyrainin\nvar precip_yr_mm = parseFloat((precip_yr_in * 25.4).toFixed(2))\n\n// Last Rain\nvar last_rain_timestamp = msg.payload[0].lastData.lastRain\nvar last_rain = last_rain_timestamp.toLocaleString()\n\n// Barometric Pressure Absolute\nvar pressure_inhg = msg.payload[0].lastData.baromabsin\nvar pressure_mb = parseInt(pressure_inhg * 33.864)\n// Wind Direction\nvar wind_degrees = msg.payload[0].lastData.winddir;\n// Indoor Temperature\nvar tempin_f = msg.payload[0].lastData.tempinf\nvar tempin_c = parseFloat(((tempin_f-32)*0.5556).toFixed(2))\n// Indoor Humidity\nvar humidityin = msg.payload[0].lastData.humidityin\n\n\nmsg.payload = {};\nmsg.payload.temp_c = temp_c;\nmsg.payload.relative_humidity = relative_humidity;\nmsg.payload.wind_kph = wind_kph;\nmsg.payload.wind_gust_kph = wind_gust_kph;\nmsg.payload.max_daily_gust_kph = max_daily_gust_kph;\nmsg.payload.dewpoint_c = dewpoint_c;\nmsg.payload.solarradiation = solarradiation;\nmsg.payload.UV = UV;\nmsg.payload.precip_1hr_mm = precip_1hr_mm;\nmsg.payload.precip_24hr_mm = precip_24hr_mm;\nmsg.payload.precip_mth_mm = precip_mth_mm;\nmsg.payload.precip_yr_mm = precip_yr_mm;\nmsg.payload.last_rain = last_rain;\nmsg.payload.pressure_mb = pressure_mb;\nmsg.payload.wind_degrees = wind_degrees;\nmsg.payload.tempin_c = tempin_c;\nmsg.payload.humidityin = humidityin;\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 512.98046875,
+        "y": 292.99609375,
+        "wires": [
+            [
+                "b86d24a5.34c678",
+                "8e8603cc.ae89e"
+            ]
+        ]
+    },
+    {
+        "id": "8e8603cc.ae89e",
+        "type": "influxdb out",
+        "z": "695fef40.89fa9",
+        "influxdb": "83442767.2c96a8",
+        "name": "influxdb",
+        "measurement": "ambientWeatherStation",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 740,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "83442767.2c96a8",
+        "type": "influxdb",
+        "z": "",
+        "hostname": "influxdb",
+        "port": "8086",
+        "protocol": "http",
+        "database": "ttndb",
+        "name": "influxdb",
+        "usetls": false,
+        "tls": ""
+    }
+]
