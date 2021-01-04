@@ -1,0 +1,34 @@
+// Author: Nick Cross
+// Date: 18 Oct 2019
+//
+// Measure distince from top of water tank to wter level
+//
+var data = parseInt(msg.payload.toString('utf8'));
+var rssi = msg.metadata.gateways[0].rssi;
+var snr = msg.metadata.gateways[0].snr;
+// var app_id = msg.app_id;
+// var dev_id = msg.dev_id;
+//
+// Tank constants for TankMasta TA1402
+var maxVol = 10000; // as marketed
+var th = 2.15; // tank height in metres
+var tr = 1.25; // tank radius in metres
+var pi = 3.14159; // pi
+//
+var wh = (th - (data/100)); // calculate water height in m
+// Total available volume Formula
+// pi x (tr x tr) x wh x 1,000 Litres
+var wv = parseInt((pi*(tr*tr)*wh)*1000); // water volume m3
+
+
+
+msg.payload = {};
+msg.payload.data = data;
+msg.payload.wh = parseFloat(wh.toFixed(2));
+msg.payload.wv = wv;
+msg.payload.rssi = rssi;
+msg.payload.snr = snr;
+// msg.payload.app_id = app_id;
+// msg.payload.dev_id = dev_id;
+//
+return msg;
